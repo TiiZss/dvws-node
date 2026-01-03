@@ -86,7 +86,7 @@ docker run -p 3306:3306 --name dvws-mysql -e MYSQL_ROOT_PASSWORD=mysecretpasswor
 Git clone the DVWS Repository 
 
 ```
-git clone https://github.com/snoopysecurity/dvws-node.git
+git clone https://github.com/TiiZss/dvws-node.git
 ```
 
 Change directory to DVWS
@@ -129,7 +129,7 @@ If you have docker compose installed on your system, all you need to execute is 
 Clone DVWS
 
 ```
-git clone https://github.com/snoopysecurity/dvws-node.git
+git clone https://github.com/TiiZss/dvws-node.git
 ```
 Change directory to dvws-node 
 
