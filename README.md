@@ -147,7 +147,7 @@ If the DVWS web service doesn't start because of delayed MongoDB or MySQL setup,
 
 
 ## Solutions
-* [DVWS Solutions Wiki](https://github.com/snoopysecurity/dvws-node/wiki)
+* [DVWS Solutions Wiki](https://github.com/TiiZss/dvws-node/wiki)
 
 
 
