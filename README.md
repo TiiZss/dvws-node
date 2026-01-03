@@ -1,9 +1,18 @@
+# dvws-node (Enhanced Fork)
+
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/TiiZss/dvws-node)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiiZss/dvws-node)](https://github.com/TiiZss/dvws-node/releases)
+[![GitHub stars](https://img.shields.io/github/stars/TiiZss/dvws-node?style=social)](https://github.com/TiiZss/dvws-node/stargazers)
 [![GitHub](https://img.shields.io/github/license/TiiZss/dvws-node)](https://github.com/TiiZss/dvws-node/blob/master/LICENSE)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow.svg)](https://www.buymeacoffee.com/TiiZss)
 
-# dvws-node (Enhanced Fork)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![GraphQL](https://img.shields.io/badge/-GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
 Damn Vulnerable Web Services is a vulnerable application with a web service and an API that can be used to learn about webservices/API related vulnerabilities.  This is a replacement for https://github.com/snoopysecurity/dvws
 
 > **Note**: This is an enhanced fork by **TiiZss**, adding new vulnerabilities and solutions.
