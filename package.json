@@ -21,7 +21,7 @@
     "graphql",
     "owasp"
   ],
-  "author": "",
+  "author": "TiiZss (Original by snoopysecurity)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/snoopysecurity/dvws-node/issues"

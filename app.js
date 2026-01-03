@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser'); // Deprecated in Express 4.16+
 const cors = require('cors');
 const swaggerUI = require('swagger-ui-express');
 const fileUpload = require('express-fileupload');
@@ -12,7 +12,7 @@ const soapservice = require('./soapserver/dvwsuserservice'); //SOAP Service
 const rpcserver = require('./rpc_server'); //XMLRPC Sever
 
 const { ApolloServer } = require('apollo-server');
-const {  GqSchema } =  require('./graphql/schema');
+const { GqSchema } = require('./graphql/schema');
 
 
 const app = express();
@@ -28,10 +28,10 @@ app.use("/js", express.static(path.join(__dirname, "node_modules/bootstrap/dist/
 app.use("/js", express.static(path.join(__dirname, "node_modules/jquery/dist")));
 app.use("/js", express.static(path.join(__dirname, "node_modules/angular")));
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/dvwsuserservice', soapservice);
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(fileUpload({ parseNested: true }));
 
 const jwt = require('jsonwebtoken')
@@ -55,34 +55,35 @@ app.use(cors(corsOptions))
 app.use('/api', routes(router));
 
 
-  
+
 app.listen(process.env.EXPRESS_JS_PORT, () => {
-    console.log(`🚀 API listening at http://dvws.local${process.env.EXPRESS_JS_PORT == 80 ? "" : ":" + process.env.EXPRESS_JS_PORT } (127.0.0.1)`);
-  });
+  console.log(`🚀 API listening at http://dvws.local${process.env.EXPRESS_JS_PORT == 80 ? "" : ":" + process.env.EXPRESS_JS_PORT} (127.0.0.1)`);
+});
 
 
-  // The ApolloServer constructor requires two parameters: your schema
+// The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-const server = new ApolloServer({ 
+const server = new ApolloServer({
   introspection: true,
   playground: true,
   debug: true,
   allowBatchedHttpRequests: true,
   schema: GqSchema,
   context: async ({ req }) => {
-       let verifiedToken = {}
-        try {
-         const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
-         verifiedToken = jwt.verify(token, process.env.JWT_SECRET, options);
-        } catch (error) {
-          verifiedToken = {}
-        }
-        return verifiedToken;
-  }, });
+    let verifiedToken = {}
+    try {
+      const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
+      verifiedToken = jwt.verify(token, process.env.JWT_SECRET, options);
+    } catch (error) {
+      verifiedToken = {}
+    }
+    return verifiedToken;
+  },
+});
 
 
 server.listen({ port: process.env.GRAPHQL_PORT }).then(({ url }) => {
-    console.log(`🚀 GraphQL Server ready at ${url}`);
-  });;
+  console.log(`🚀 GraphQL Server ready at ${url}`);
+});;
 
 module.exports = app;
