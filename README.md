@@ -10,6 +10,18 @@ Damn Vulnerable Web Services is a vulnerable application with a web service and 
 
 ![DVWS](https://github.com/snoopysecurity/Public/blob/master/dvws/dvws.png)
 
+## Key Enhancements vs Original
+This fork actively maintains and expands upon the original project. Key differences include:
+- **New Vulnerabilities Implemented**:
+  - CSRF, CRLF Injection, SSRF (Webhook), GraphQL DoS & NoSQL Injection, SOAP Injection.
+- **Fixed & Enhanced Docker Support**:
+  - Integrated `wait-for-it` logic to ensure databases are ready.
+  - Resolved container naming conflicts.
+- **Improved Documentation**:
+  - **Solutions Cheatsheet** included.
+  - Solutions Wiki replicated and updated.
+  - Clearer `README.md` with status indicators.
+
 This vulnerable application contains the following API/Web Service vulnerabilities:
 
 * Insecure Direct Object Reference
