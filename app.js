@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-//const bodyParser = require('body-parser'); // Deprecated in Express 4.16+
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const swaggerUI = require('swagger-ui-express');
 const fileUpload = require('express-fileupload');
@@ -28,10 +28,10 @@ app.use("/js", express.static(path.join(__dirname, "node_modules/bootstrap/dist/
 app.use("/js", express.static(path.join(__dirname, "node_modules/jquery/dist")));
 app.use("/js", express.static(path.join(__dirname, "node_modules/angular")));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/dvwsuserservice', soapservice);
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(fileUpload({ parseNested: true }));
 
 const jwt = require('jsonwebtoken')

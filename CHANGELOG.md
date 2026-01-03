@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-01-03
+### Added
+- **Security Policy**: Added `SECURITY.md` to warn users about the vulnerable nature of the app.
+- **Contributing Guidelines**: Added `CONTRIBUTING.md`.
+- **Project Badges**: Added tech stack, version, and star badges to README.
+- **Improved Documentation**: Migrated Solutions to Project Wiki and updated all links.
+- **Wiki**: Full migration of documentation to the repository Wiki.
+
+### Fixed
+- **Docker Stability**: Reverted `body-parser` removal to ensure stability during login.
+- **Documentation Links**: Corrected all cloning instructions and external links to point to the new repository `TiiZss/dvws-node`.
+
 ## [1.0.0] - 2026-01-03
 
 ### Added
