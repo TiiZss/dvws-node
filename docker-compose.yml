@@ -1,18 +1,21 @@
 version: '3'
 services:
     dvws-mongo:
+        container_name: dvws-mongo
         image: mongo:4.0.4
     dvws-mysql:
+        container_name: dvws-mysql
         image: mysql:8
         environment:
             MYSQL_ROOT_PASSWORD: mysecretpassword
             MYSQL_DATABASE: dvws_sqldb
     web:
+        container_name: dvws-web
         build: .
         ports:
-        - "80:80"
-        - "4000:4000"          
-        - "9090:9090"        
+            - "80:80"
+            - "4000:4000"
+            - "9090:9090"
         command: sh -c "/wait && node startup_script.js && npm start"
         environment:
             WAIT_HOSTS: dvws-mysql:3306, dvws-mongo:27017
