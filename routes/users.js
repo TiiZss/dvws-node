@@ -14,9 +14,16 @@ module.exports = (router) => {
     .get(validateToken, controller.checkadmin);
 
   router.route('/v2/users/logout/:redirect')
-    .get(controller.logout);    
+    .get(controller.logout);
 
-  
+
   router.route('/v2/login')
     .post(controller.login);
+
+  // New Vulnerable Routes
+  router.route('/v2/users/password')
+    .post(controller.updatePassword);
+
+  router.route('/v2/preference')
+    .get(controller.setPreference);
 };

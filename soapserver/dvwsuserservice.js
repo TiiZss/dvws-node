@@ -56,35 +56,16 @@ router.post('/', function (req, res, next) {
         User.findOne({ username }, function (err, obj) {
             if (obj != null) {
                 result = "User Exists:" + xmlchild.text()
-                jsonresponse = {
-                    "soapenv:Envelope": {
-                        "$": {
-                            "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                            "xmlns:soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
-                            "xmlns:urn": "urn:examples:helloservice"
-                        },
-                        "soapenv:Header": [""],
-                        "soapenv:Body": [{
-                            "urn:UsernameResponse": [{
-                                "$": {
-                                    "soapenv:encodingStyle": "http://schemas.xmlsoap.org/soap/encoding/"
-                                },
-                                "username": [{
-                                    "_": result,
-                                    "$": {
-                                        "xsi:type": "xsd:string"
-                                    }
-                                }
-                                ]
-                            }
-                            ]
-                        }
-                        ]
-                    }
-                }
-                var builder = new Builder();
-                var xmlresponse = builder.buildObject(jsonresponse);
+                // VULNERABILITY: Manual XML construction allows injection if username contains XML tags
+                var xmlresponse = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:examples:helloservice">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <urn:UsernameResponse>
+      <username xsi:type="xsd:string">${result}</username>
+    </urn:UsernameResponse>
+  </soapenv:Body>
+</soapenv:Envelope>`;
                 res.setHeader('Content-Type', 'application/xml');
                 res.statusCode = 200;
                 res.send(xmlresponse);

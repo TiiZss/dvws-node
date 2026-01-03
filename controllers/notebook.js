@@ -20,7 +20,7 @@ const connUri = process.env.MONGO_LOCAL_CONN_URL;
 const connUri2 = connUri.substr(0, connUri.lastIndexOf("/"));
 
 
-  
+
 
 
 function set_cors(req, res) {
@@ -48,16 +48,16 @@ module.exports = {
     res = set_cors(req, res)
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
 
-        let result = {}
-        const token = req.headers.authorization.split(' ')[1]; 
-        result = jwt.verify(token, process.env.JWT_SECRET, options);
-        Note.find({ user: result.user }, { __v: 0 }, function (err, someValue) {
-          if (err) {
-            res.json(err);
-          } else {
-          res.send(someValue);
-          }
-        });
+    let result = {}
+    const token = req.headers.authorization.split(' ')[1];
+    result = jwt.verify(token, process.env.JWT_SECRET, options);
+    Note.find({ user: result.user }, { __v: 0 }, function (err, someValue) {
+      if (err) {
+        res.json(err);
+      } else {
+        res.send(someValue);
+      }
+    });
 
 
   },
@@ -94,78 +94,78 @@ module.exports = {
       xpath.XPathResult.ANY_TYPE, // resultType
       null                        // result
     )
-    
+
     var result = [];
     node = xpath_result.iterateNext();
     while (node) {
-        result.push(node.toString());
-        node = xpath_result.iterateNext();
+      result.push(node.toString());
+      node = xpath_result.iterateNext();
     }
 
     res.send(result.toString());
-    
+
   },
   create_a_note: (req, res) => {
     res = set_cors(req, res)
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
 
-        let result = {}
-        const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
-        result = jwt.verify(token, process.env.JWT_SECRET, options);
-        var body = req.body
+    let result = {}
+    const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
+    result = jwt.verify(token, process.env.JWT_SECRET, options);
+    var body = req.body
 
-        var new_note = new Note({ name: body.name, body: body.body, type: body.type, user: result.user });
-        new_note.save(function (err, note) {
-          if (err) {
-            res.send(err);
-          } else {
-            res.json(note);
+    var new_note = new Note({ name: body.name, body: body.body, type: body.type, user: result.user });
+    new_note.save(function (err, note) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.json(note);
 
-          }
-          
-        });
+      }
+
+    });
 
   },
   read_a_note: (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-        Note.findOne({no: req.params.noteId}, function (err, note) {
-          if (err) {
-            res.send(err);
-          } else {
-          res.json(note);
-          }
-        });
+    Note.findOne({ no: req.params.noteId }, function (err, note) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.json(note);
+      }
+    });
 
   },
 
   update_a_note: (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-        Note.findOneAndUpdate({name: req.params.noteId }, req.body, { new: true }, function (err, note) {
-          if (err) {
+    Note.findOneAndUpdate({ name: req.params.noteId }, req.body, { new: true }, function (err, note) {
+      if (err) {
 
-            res.send(err);
+        res.send(err);
 
-          } else {
-            res.json(note);
-          }
-        });
+      } else {
+        res.json(note);
+      }
+    });
 
 
   },
 
   delete_a_note: (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-        Note.remove({
-          name: req.params.noteId
-        }, function (err, note) {
-          if (err) {
-            res.send(err);
+    Note.remove({
+      name: req.params.noteId
+    }, function (err, note) {
+      if (err) {
+        res.send(err);
 
-          } else {  
-          res.json({ message: 'Note successfully deleted' });
+      } else {
+        res.json({ message: 'Note successfully deleted' });
 
-          }
-        });
+      }
+    });
   },
 
 
@@ -185,8 +185,8 @@ module.exports = {
           res.send(items);
           client.close();
         })
-        
-      }     
+
+      }
     });
 
   },
@@ -194,7 +194,7 @@ module.exports = {
   display_all: (req, res) => {
     res = set_cors(req, res)
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-    const projection = { _id: 0, name: 1, body: 1, type: 1, user: 1};
+    const projection = { _id: 0, name: 1, body: 1, type: 1, user: 1 };
     MongoClient.connect(connUri2, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
       if (!err) {
         var db = client.db('node-dvws')
@@ -205,10 +205,26 @@ module.exports = {
           res.send(items);
           client.close();
         })
-        
-      }     
+
+      }
     });
 
+  },
+
+  import_note: (req, res) => {
+    // VULNERABILITY: SSRF / Webhook - Fetches URL without validation
+    const needle = require('needle');
+    const url = req.body.url;
+    if (!url) {
+      return res.status(400).send({ error: 'URL is required' });
+    }
+    // Simple SSRF: Just fetch the URL and return body
+    needle.get(url, (err, resp) => {
+      if (err) {
+        return res.status(500).send({ error: err.message });
+      }
+      res.send({ status: resp.statusCode, body: resp.body });
+    });
   }
-  
+
 }

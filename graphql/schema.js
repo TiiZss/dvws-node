@@ -25,6 +25,7 @@ const GqtypeDefs = gql`
     password: String
     admin: Boolean
     token: String
+    friends: [User]
   }
   
   type Notebook {
@@ -52,7 +53,9 @@ const GqtypeDefs = gql`
     userSearchByUsername(username: String): [User]
     noteFindbyId(id: ID): Notebook
     readNote(name: String): [Notebook]
+
     getPassphrase(reminder: String): Passphrase
+    unsafeSearch(filter: String): [User]
   }
 
 
@@ -68,152 +71,173 @@ const GqtypeDefs = gql`
 
 
 
-  // Resolvers define the technique for fetching the types defined in the
+// Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const Gqresolvers = {
-    Query: {
-      userFindbyId: (parent, args, context, info) => {
-        return User.findById(args.id)
+  Query: {
+    userFindbyId: (parent, args, context, info) => {
+      return User.findById(args.id)
     },
     userSearchByUsername: async (parent, args, context, info) => {
       user = args.username;
       result = await User.find({ username: user }, '_id username admin').exec();
       return result;
-  },
-  noteFindbyId: (parent, args, context, info) => {
-    return Note.findById(args.id);
     },
-  
-  readNote: async (parent, args, context, info) => {
+    noteFindbyId: (parent, args, context, info) => {
+      return Note.findById(args.id);
+    },
 
-    if ( typeof context.user == 'undefined' ){
-      throw new Error( "Missing JWT Admin Auth Token");
-      } 
+    readNote: async (parent, args, context, info) => {
+
+      if (typeof context.user == 'undefined') {
+        throw new Error("Missing JWT Admin Auth Token");
+      }
       note = args.name;
       result = await Note.find({ name: note }, 'name body user _id type').exec();
       return result;
-      },
-  getPassphrase: async (parent, args, context, info) => {
+    },
+    getPassphrase: async (parent, args, context, info) => {
 
-    var query = "select passphrase,reminder from passphrases WHERE reminder = " +  sql.escape(args.reminder) + "";
-    let sqlInput;
-    await(new Promise((resolve, reject) => {
-    sql.query( query, function (err, result, fields) {
-        if (err) {
-        throw new Error(err);  
-        resolve();
-        } else {
-            
+      var query = "select passphrase,reminder from passphrases WHERE reminder = " + sql.escape(args.reminder) + "";
+      let sqlInput;
+      await (new Promise((resolve, reject) => {
+        sql.query(query, function (err, result, fields) {
+          if (err) {
+            throw new Error(err);
+            resolve();
+          } else {
+
             sqlInput = result;
             resolve()
+          }
+        });
+      }));
+      return sqlInput[0];
+    },
+
+    unsafeSearch: async (parent, args, context, info) => {
+      // VULNERABILITY: NoSQL Injection via JSON parsing of user input
+      try {
+        const query = JSON.parse(args.filter);
+        return await User.find(query).exec();
+      } catch (e) {
+        return [];
+      }
+    },
+  },
+  User: {
+    friends: async (parent, args, context, info) => {
+      // VULNERABILITY: Circular reference allows DoS
+      return await User.find({}).exec();
+    }
+  },
+  Mutation: {
+    updateUserUploadFile: async (parent, args, context, info) => {
+
+      UpdatedFile = {}
+
+      if (typeof context.user == 'undefined') {
+        throw new Error("Missing JWT Admin Auth Token");
+      }
+
+      filePath = __dirname + '/../public/uploads/' + context.user + "/" + args.filePath;
+      await fsPromise.writeFile(filePath, args.fileContent);
+
+      UpdatedFile['filePath'] = filePath
+      UpdatedFile['fileContent'] = args.fileContent
+      return UpdatedFile;
+    },
+
+    userLogin: async (parent, args, context, info) => {
+
+      let returnVar = {};
+      var argsusername = args.username;
+      var argspassword = args.password;
+
+      result = await User.find({ username: argsusername }, 'username password').exec();
+      if (result.length == 0) {
+        throw new Error("User Login Failed");
+      }
+      returnVar['username'] = result[0].username;
+      returnVar['password'] = result[0].password;
+
+      returnval = passwordCompare(argspassword, result);
+      token = await returnval.then(function (token) {
+        returnVar['token'] = token;
+      })
+      return returnVar;
+
+    },
+
+    createNote: async (parent, args, context, info) => {
+
+      if (typeof context.user == 'undefined') {
+        throw new Error("Missing JWT Admin Auth Token");
+      }
+
+      var new_note = new Note({ name: args.name, body: args.body, type: args.type, user: context.user });
+      new_note.save(function (err, note) {
+        if (err) {
+          throw new Error(err);
         }
       });
-    }));
-    return sqlInput[0];
-      },
-    },
-    Mutation: {
-      updateUserUploadFile: async (parent, args, context, info) => {
+      result = await Note.find({ name: args.name }, 'name body user _id type').exec();
+      return result;
 
-        UpdatedFile = {}
-      
-       if ( typeof context.user == 'undefined' ){
-          throw new Error( "Missing JWT Admin Auth Token");
-       } 
-        
-       filePath = __dirname + '/../public/uploads/' + context.user + "/" +  args.filePath;
-       await fsPromise.writeFile(filePath,args.fileContent);
+    }
+  },
 
-        UpdatedFile['filePath'] = filePath
-        UpdatedFile['fileContent'] = args.fileContent
-        return UpdatedFile;
-        },
-
-      userLogin: async (parent, args, context, info) => {
-
-          let returnVar = {};
-          var argsusername = args.username;
-          var argspassword = args.password;
-    
-          result =  await User.find({ username: argsusername }, 'username password').exec();
-          if( result.length == 0 ) {
-            throw new Error( "User Login Failed");
-          }
-          returnVar['username'] = result[0].username;
-          returnVar['password'] = result[0].password;
-    
-          returnval = passwordCompare(argspassword,result);
-          token = await returnval.then(function(token) {
-            returnVar['token'] = token;
-          })
-          return returnVar;
-
-        },
-
-      createNote: async (parent, args, context, info) => {
-
-        if ( typeof context.user == 'undefined' ){
-          throw new Error( "Missing JWT Admin Auth Token");
-       } 
-
-       var new_note = new Note({ name: args.name , body: args.body, type: args.type, user: context.user});
-       new_note.save(function (err, note) {
-         if (err) {
-           throw new Error(err);
-         }
-       }); 
-       result = await Note.find({ name: args.name }, 'name body user _id type').exec();
-       return result;
-
-      }
-      },
-      
-  };
+};
 
 
 
 
-function passwordCompare(argspassword,dbresult) {
+function passwordCompare(argspassword, dbresult) {
   user = dbresult[0].username;
   dbtoken = bcrypt.compare(argspassword, dbresult[0].password).then(match => {
     if (match) {
 
       if (user.admin == true) {
-        const payload = { user: dbresult[0].username,"permissions": [
-          "user:read",
-          "user:write",
-          "user:admin"
-        ] };
-        const options = { expiresIn: '2d', issuer: 'https://github.com/snoopysecurity', algorithm: "HS256"};
+        const payload = {
+          user: dbresult[0].username, "permissions": [
+            "user:read",
+            "user:write",
+            "user:admin"
+          ]
+        };
+        const options = { expiresIn: '2d', issuer: 'https://github.com/snoopysecurity', algorithm: "HS256" };
         const secret = process.env.JWT_SECRET;
         const token = jwt.sign(payload, secret, options);
-        
+
 
         return token;
       } else {
 
-        const payload = { user: dbresult[0].username,"permissions": [
-          "user:read",
-          "user:write"
-        ] };
-        const options = { expiresIn: '2d', issuer: 'https://github.com/snoopysecurity', algorithm: "HS256"};
+        const payload = {
+          user: dbresult[0].username, "permissions": [
+            "user:read",
+            "user:write"
+          ]
+        };
+        const options = { expiresIn: '2d', issuer: 'https://github.com/snoopysecurity', algorithm: "HS256" };
         const secret = process.env.JWT_SECRET;
         const token = jwt.sign(payload, secret, options);
 
-        return token;       }
+        return token;
+      }
     } else {
-      throw new Error( "Authentication error");
+      throw new Error("Authentication error");
       return result;
     }
 
   }).catch(err => {
-    dbtoken= err;
+    dbtoken = err;
   });
   return dbtoken;
 
 }
 
 exports.GqSchema = graphqlTools.makeExecutableSchema({
-  typeDefs: [ GqtypeDefs ],
+  typeDefs: [GqtypeDefs],
   resolvers: Gqresolvers,
 });

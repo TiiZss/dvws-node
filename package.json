@@ -9,9 +9,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/snoopysecurity/dvws-node"
+    "url": "git+https://github.com/TiiZss/dvws-node"
   },
-  "keywords": [],
+  "keywords": [
+    "vulnerable",
+    "security",
+    "training",
+    "dvws",
+    "node",
+    "soap",
+    "graphql",
+    "owasp"
+  ],
   "author": "",
   "license": "MIT",
   "bugs": {

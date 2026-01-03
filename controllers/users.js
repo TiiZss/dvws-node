@@ -176,5 +176,34 @@ module.exports = {
             res.status(status).send(result);
           })
 
+  },
+
+  // CSRF Vulnerability: Updates password without verification or CSRF token
+  updatePassword: (req, res) => {
+    const { username, newPassword } = req.body;
+    // VULNERABILITY: No check for old password, no CSRF token check
+    User.findOneAndUpdate({ username: username }, { password: newPassword }, { new: true }, (err, user) => {
+      if (!err && user) {
+        res.status(200).send({ status: 200, message: 'Password updated successfully' });
+      } else {
+        res.status(500).send({ status: 500, error: 'Update failed' });
+      }
+    });
+  },
+
+  // CRLF Injection: Echoes user input into headers
+  setPreference: (req, res) => {
+    const { theme } = req.query;
+    // VULNERABILITY: User input 'theme' is directly used in setHeader without sanitization
+    // Attackers can send "dark\r\nSet-Cookie: session=hijacked"
+    try {
+        res.setHeader('X-User-Preference', theme);
+        res.status(200).send({ status: 200, message: 'Preference saved' });
+    } catch (e) {
+        // Node.js modern versions might throw on invalid chars in headers, but we implement the logic.
+        // To strictly demonstrate, we might need to bypass Express/Node checks if they exist, 
+        // but this is the standard vulnerable pattern.
+        res.status(500).send({ error: e.message });
+    }
   }
 };

@@ -1,7 +1,12 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/snoopysecurity/dvws-node) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/TiiZss/dvws-node)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiiZss/dvws-node)](https://github.com/TiiZss/dvws-node/releases)
+[![GitHub](https://img.shields.io/github/license/TiiZss/dvws-node)](https://github.com/TiiZss/dvws-node/blob/master/LICENSE)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow.svg)](https://www.buymeacoffee.com/TiiZss)
 
-# dvws-node
+# dvws-node (Enhanced Fork)
 Damn Vulnerable Web Services is a vulnerable application with a web service and an API that can be used to learn about webservices/API related vulnerabilities.  This is a replacement for https://github.com/snoopysecurity/dvws
+
+> **Note**: This is an enhanced fork by **TiiZss**, adding new vulnerabilities and solutions.
 
 ![DVWS](https://github.com/snoopysecurity/Public/blob/master/dvws/dvws.png)
 
@@ -125,20 +130,24 @@ If the DVWS web service doesn't start because of delayed MongoDB or MySQL setup,
 
 
 
-## To Do
-* Cross-Site Request Forgery (CSRF)
-* XML Bomb Denial-of-Service
-* API Endpoint Brute Forcing
-* Web Socket Security
-* Type Confusion
-* LDAP Injection
-* SOAP Injection
-* XML Injection
-* GRAPHQL Denial Of Service
-* CRLF Injection
-* GraphQL Injection
-* Webhook security
+## Implemented Vulnerabilities (Enhanced)
+* [x] Cross-Site Request Forgery (CSRF)
+* [x] XML Bomb Denial-of-Service (via Configuration)
+* [x] API Endpoint Brute Forcing (Default behavior)
+* [ ] Web Socket Security (Skipped due to env)
+* [x] Type Confusion (Default behavior)
+* [ ] LDAP Injection (Skipped - External Dependency)
+* [x] SOAP Injection
+* [x] XML Injection
+* [x] GRAPHQL Denial Of Service
+* [x] CRLF Injection
+* [x] GraphQL Injection (NoSQL)
+* [x] Webhook security (SSRF)
 
+
+## Acknowledgements
+
+Special thanks to **Appsecco** and the original author **snoopysecurity** for creating DVWS and DVWS-node, providing a fantastic platform for learning API security. This fork builds upon their excellent work.
 
 ## Any Questions
 
